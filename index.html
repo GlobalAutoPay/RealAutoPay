@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AutoPay wYMagicServer</title> 
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+    :root {
+        --accent-red: #ff3b30;
+        --glass-panel: rgba(255, 255, 255, 0.03); 
+        --glass-border: rgba(255, 255, 255, 0.1); 
+        --glass-element: rgba(255, 255, 255, 0.04); 
+        --glass-hover: rgba(255, 255, 255, 0.08);
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #18181e; 
+        color: #ffffff;
+        overflow-x: hidden;
+        margin: 0;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* =========================================
+       FONDO ANIMADO ULTRARRÁPIDO (Cero Lag)
+       ========================================= */
+    .bg-blobs {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        z-index: -1;
+        overflow: hidden;
+        background: #18181e; 
+    }
+    
+    .blob {
+        position: absolute;
+        border-radius: 50%;
+        will-change: transform;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        animation: float 20s infinite alternate ease-in-out;
+    }
+    
+    .blob-1 { top: -20%; left: -20%; width: 70vw; height: 70vw; background: radial-gradient(circle, rgba(153,0,0,0.4) 0%, transparent 70%); animation-delay: 0s; }
+    .blob-2 { bottom: -30%; right: -20%; width: 80vw; height: 80vw; background: radial-gradient(circle, rgba(58,58,72,0.6) 0%, transparent 70%); animation-delay: -5s; }
+    .blob-3 { top: 20%; left: 30%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(255,59,48,0.2) 0%, transparent 70%); animation-delay: -10s; }
+
+    @keyframes float {
+        0% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(5%, 5%, 0) scale(1.05); }
+        100% { transform: translate3d(-5%, -5%, 0) scale(0.95); }
+    }
+
+    /* =========================================
+       GLASSMORPHISM OPTIMIZADO
+       ========================================= */
+    .glass-master {
+        background: var(--glass-panel);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transform: translate3d(0,0,0);
+    }
+
+    .glass-element {
+        background: var(--glass-element);
+        border: 1px solid var(--glass-border);
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .glass-element:hover {
+        background: var(--glass-hover);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* TARJETAS DE PAGO */
+    .method-option {
+        border-radius: 16px;
+        transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .method-icon-container {
+        width: 4rem;
+        height: 4rem;
+        border-radius: 14px;
+        overflow: hidden; 
+        border: 2px solid rgba(255, 255, 255, 0.05);
+        background-color: transparent; 
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        will-change: transform;
+    }
+    
+    .method-logo-svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-radius: 12px; 
+        filter: grayscale(100%) opacity(60%);
+        transition: filter 0.3s ease, transform 0.3s ease;
+    }
+
+    .method-option:hover .method-icon-container {
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: scale(1.03);
+    }
+    .method-option:hover .method-logo-svg {
+        filter: grayscale(50%) opacity(80%);
+    }
+
+    .method-option.selected {
+        background: rgba(255, 59, 48, 0.08);
+        border-color: rgba(255, 59, 48, 0.5);
+        box-shadow: 0 10px 30px rgba(255, 59, 48, 0.1), inset 0 0 15px rgba(255, 59, 48, 0.05);
+    }
+    
+    .method-option.selected .method-icon-container {
+        border-color: rgba(255, 59, 48, 0.8);
+        box-shadow: 0 0 20px rgba(255, 59, 48, 0.4);
+        transform: scale(1.05);
+    }
+    .method-option.selected .method-logo-svg {
+        filter: grayscale(0%) opacity(100%);
+        transform: scale(1.02);
+    }
+
+    /* INPUTS */
+    .glass-input {
+        background: rgba(0, 0, 0, 0.15); 
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        border-radius: 12px;
+        font-weight: 500; 
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+    .glass-input::placeholder { color: rgba(255, 255, 255, 0.4); font-weight: 400; }
+    .glass-input:focus {
+        outline: none;
+        background: rgba(0, 0, 0, 0.25);
+        border-color: var(--accent-red);
+        box-shadow: 0 0 0 1px var(--accent-red), 0 0 15px rgba(255, 59, 48, 0.15);
+    }
+
+    /* Ocultar las flechas selectoras del input de números */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type="number"] {
+        -moz-appearance: textfield; /* Para Firefox */
+    }
+
+    /* BOTÓN PRINCIPAL */
+    .glass-btn {
+        background: #ffffff;
+        color: #000000;
+        border: none;
+        font-weight: 700; 
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        will-change: transform;
+    }
+    .glass-btn:hover {
+        background: #f0f0f0;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(255, 255, 255, 0.25);
+    }
+    .glass-btn:disabled {
+        background: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.4);
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+    .file-input { opacity: 0; position: absolute; z-index: -1; width: 0; height: 0; }
+
+    /* MODAL */
+    .modal-backdrop {
+        position: fixed; inset: 0;
+        background: rgba(0, 0, 0, 0.6); 
+        backdrop-filter: blur(12px); 
+        display: flex; justify-content: center; align-items: center;
+        z-index: 50; opacity: 0; visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-backdrop.show { opacity: 1; visibility: visible; }
+    .modal-content {
+        transform: scale(0.95) translateY(10px);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform;
+    }
+    .modal-backdrop.show .modal-content { transform: scale(1) translateY(0); }
+
+    .pulse-text { animation: pulseAlpha 2s infinite; }
+    @keyframes pulseAlpha { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    .glass-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    }
+</style>
+</head>
+<body class="flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
+
+<!-- FONDO FLUIDO OPTIMIZADO -->
+<div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
+
+<!-- ==========================================
+     VENTANA MODAL REDISEÑADA (Más elegante)
+     ========================================== -->
+<div id="payment-success-modal" class="modal-backdrop">
+    <div class="modal-content glass-master w-full max-w-md p-10 rounded-[2rem] text-center relative border-none">
+        
+        <!-- Icono central brillante con el efecto rojo -->
+        <div class="relative w-24 h-24 mx-auto mb-6">
+            <!-- Aura sutil roja -->
+            <div class="absolute inset-0 bg-[var(--accent-red)] rounded-full blur-xl opacity-20 pulse-text"></div>
+            <!-- Esfera de cristal con destello rojo -->
+            <div class="relative w-full h-full glass-element rounded-full flex items-center justify-center border border-[var(--accent-red)]/30 shadow-[0_0_20px_rgba(255,59,48,0.15)]">
+                <i class="fas fa-check text-[var(--accent-red)] text-4xl"></i>
+            </div>
+        </div>
+
+        <h3 class="text-3xl text-white mb-3 font-bold tracking-tight">¡Pago Enviado!</h3>
+        
+        <!-- Píldora de estado -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-element border border-white/10 mb-8">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]"></span>
+            <span class="text-gray-300 font-medium text-xs tracking-wide">El pago fue enviado correctamente, El saldo se agrega en segundos</span>
+        </div>
+
+        <!-- Caja de aviso completamente limpia y transparente (Sin bordes neón) -->
+        <div class="text-left glass-element p-5 rounded-2xl mb-8 border border-white/10">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-info-circle text-gray-400 mt-0.5"></i>
+                <div>
+                    <p class="text-white text-sm font-semibold mb-1">Importante</p>
+                    <p class="text-gray-400 text-xs font-medium leading-relaxed">
+                        Por favor, <span class="text-white font-semibold">no reenvíes este mismo comprobante</span>. Esto evita duplicados y acelera la aprobación de tu saldo.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <p id="modal-redirect-text" class="text-xs text-gray-500 font-medium">
+            Redirigiendo a la página principal en <span class="text-white font-bold">20</span>s...
+        </p>
+    </div>
+</div>
+
+<!-- CONTENEDOR PRINCIPAL -->
+<div id="payment-card" class="glass-master w-full max-w-3xl p-8 sm:p-12 rounded-[2.5rem] relative z-10">
+    
+    <!-- ENCABEZADO -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+        <div>
+            <div class="flex items-baseline gap-3 mb-1">
+                <h1 class="text-4xl sm:text-5xl text-white font-bold tracking-tight">AutoPay</h1>
+            </div>
+            <div class="flex items-center gap-2 mt-2">
+                <!-- Se eliminó la clase 'uppercase' para que respete wYMagicServer -->
+                <span class="text-[var(--accent-red)] text-sm font-bold tracking-widest">wYMagicServer</span>
+                <span class="text-gray-400 text-xs font-medium">| Best GSM Services</span>
+            </div>
+        </div>
+        
+        <div class="text-left md:text-right">
+            <p class="text-gray-300 text-[10px] font-semibold uppercase tracking-widest mb-1.5">Tu ID de Usuario</p>
+            <span id="user-id-display" class="glass-element px-4 py-2 rounded-xl text-white text-sm font-mono font-medium cursor-pointer hover:bg-[var(--accent-red)] hover:border-[var(--accent-red)] hover:text-white inline-block shadow-sm" title="Copiar ID">...</span>
+        </div>
+    </div>
+    
+    <form id="payment-form" class="space-y-10">
+        <!-- HONEYPOT FIELD -->
+        <div style="display:none;">
+            <input type="text" id="hp-field" name="website" tabindex="-1" autocomplete="off">
+        </div>
+        
+        <!-- PASO 1: SELECCIÓN -->
+        <div>
+            <div class="flex justify-between items-end mb-6">
+                <h3 class="text-xl text-white font-semibold tracking-tight">
+                    <span class="text-[var(--accent-red)] mr-2 font-bold">Paso 1</span> Elije tu método de pago
+                </h3>
+                <span class="text-gray-300 text-xs font-semibold bg-white/5 px-3 py-1 rounded-full border border-white/10">Mínimo 3 USD</span>
+            </div>
+
+            <!-- Botones JS -->
+            <div id="payment-options-container" class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            </div>
+        </div>
+        
+        <!-- PASOS 2 Y 3 -->
+        <div id="next-steps-container" class="hidden opacity-0 translate-y-4 transition-[opacity,transform] duration-300 ease-out space-y-10">
+            
+            <div class="glass-divider"></div>
+
+            <!-- PASO 2: DETALLES -->
+            <div>
+                <h3 class="text-xl text-white font-semibold tracking-tight mb-6">
+                    <span class="text-[var(--accent-red)] mr-2 font-bold">Paso 2</span> Datos de pago
+                </h3>
+
+                <div id="account-details-container" class="pl-0 sm:pl-8">
+                    <!-- Detalles JS -->
+                </div>
+            </div>
+
+            <div class="glass-divider"></div>
+
+            <!-- PASO Final: CONFIRMACIÓN -->
+            <div>
+                <h3 class="text-xl text-white font-semibold tracking-tight mb-6">
+                    <span class="text-[var(--accent-red)] mr-2 font-bold">Paso Final</span> Confirmación
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 pl-0 sm:pl-8">
+                    <div>
+                        <label for="server-email" class="block text-gray-200 text-xs font-semibold mb-2 ml-1 tracking-wide uppercase">Correo de tu cuenta del server</label>
+                        <input type="email" id="server-email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}" placeholder="ejemplo@correo.com" class="glass-input w-full p-4" required>
+                    </div>
+
+                    <div>
+                        <label for="amount" class="block text-gray-200 text-xs font-semibold mb-2 ml-1 tracking-wide uppercase">Monto transferido</label>
+                        <!-- Se cambia type="number" a type="text" con inputmode="decimal" para permitir el formateo en vivo -->
+                        <input type="text" id="amount" inputmode="decimal" placeholder="0.00" class="glass-input w-full p-4" required>
+                    </div>
+                </div>
+                
+                <div class="pl-0 sm:pl-8">
+                    <label class="block text-gray-200 text-xs font-semibold mb-2 ml-1 tracking-wide uppercase">Cargar comprobante de pago</label>
+                    <input type="file" id="file-upload" accept="image/*, application/pdf" class="file-input" required>
+                    
+                    <label for="file-upload" id="file-label" class="glass-element w-full flex flex-col items-center justify-center py-10 rounded-2xl cursor-pointer hover:bg-white/10 group">
+                        <div class="w-16 h-16 rounded-full bg-white/5 group-hover:bg-[var(--accent-red)] border border-white/10 group-hover:border-[var(--accent-red)] flex items-center justify-center mb-4 transition-colors duration-200">
+                            <i class="fas fa-upload text-gray-300 group-hover:text-white text-2xl transition-colors"></i>
+                        </div>
+                        <span id="file-name" class="text-white text-sm font-medium px-4 transition-colors">Adjuntar JPG, PNG o PDF</span>
+                        <span class="text-gray-400 text-xs font-medium mt-2 bg-black/30 px-3 py-1 rounded-full">Max. 5MB</span>
+                    </label>
+                </div>
+
+                <div class="mt-8 pl-0 sm:pl-8">
+                    <button type="submit" id="verify-button" class="glass-btn w-full py-4 rounded-xl text-base tracking-wide flex justify-center items-center gap-2">
+                        <span>Completar Recarga
+                        </span> <i class="fas fa-arrow-right text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    <!-- Mensajes Feedback -->
+    <div id="feedback-message" class="mt-8 text-sm font-semibold text-center hidden bg-black/40 py-3 rounded-xl border border-white/10 backdrop-blur-md"></div>
+
+    <!-- Pie de página -->
+    <div class="mt-12 pt-6 border-t border-white/5 flex flex-col items-center gap-2">
+        <a href="https://wa.me/message/K3NUVQUXNQGDL1" target="_blank" class="text-gray-400 hover:text-white text-sm font-medium transition-colors flex items-center gap-2">
+            <i class="fab fa-whatsapp text-green-500"></i> Contactar soporte técnico
+        </a>
+        <p id="dev-credit" class="text-gray-500 text-[10px] font-bold tracking-widest mt-1 uppercase">Dev: YettaZs</p>
+    </div>
+
+</div>
+
+<script>
+    const TELEGRAM_BOT_TOKEN = "8376859170:AAFwY7Uk8vK2xXKJeMWup43vT8E7wE8QMvo"; 
+    const TELEGRAM_CHAT_ID = "-1003016658692";     
+    const REDIRECT_URL = "https://wymagicserver.es/"; 
+    
+    const REDIRECT_DELAY_SECONDS = 20; 
+    const MAX_FILE_SIZE_MB = 5; 
+    const COOLDOWN_SECONDS = 420; 
+    const MIN_RECHARGE_USD = 3;
+
+    const PAYMENT_ACCOUNTS = {
+        binance_pay: { 
+            title: "Binance Pay",
+            display: "Binance", 
+            svgIcon: `<svg viewBox="-60 -60 120 120" xmlns="http://www.w3.org/2000/svg" class="method-logo-svg">
+                <rect x="-60" y="-60" width="120" height="120" fill="#202124" />
+                <g transform="rotate(45)">
+                    <rect x="-8" y="-8" width="16" height="16" fill="#F3BA2F" />
+                    <rect x="-30" y="14" width="16" height="16" fill="#F3BA2F" />
+                    <rect x="14" y="-30" width="16" height="16" fill="#F3BA2F" />
+                    <path d="M 0,-22 L -22,-22 L -22,0" stroke="#F3BA2F" stroke-width="16" fill="none" stroke-linejoin="miter" stroke-linecap="square" />
+                    <path d="M 0,22 L 22,22 L 22,0" stroke="#F3BA2F" stroke-width="16" fill="none" stroke-linejoin="miter" stroke-linecap="square" />
+                </g>
+            </svg>`, 
+            data: [
+                { label: "PayID", value: "422013789", copyable: true, type: "number" },
+                { label: "Titular", value: "Abibii", copyable: false, type: "name" }
+            ],
+            currency: "USD",
+        },
+        nequi: {
+            title: "Nequi / Daviplata", 
+            rateUsd: 4200, 
+            display: "Nequi / Daviplata", 
+            svgIcon: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="method-logo-svg">
+                <rect width="100" height="100" fill="#FFFFFF" />
+                <rect x="18" y="32" width="12" height="12" rx="2" fill="#E11171" />
+                <path d="M34 68 V32 H44 L60 56 V32 H70 V68 H60 L44 44 V68 Z" fill="#140B24" />
+            </svg>`, 
+            data: [
+                { label: "Nequi", value: "3223541589", copyable: true, type: "number" }, 
+                { label: "Daviplata", value: "3223541589", copyable: true, type: "number" }, 
+                { label: "Titular", value: "Har Pic", copyable: false, type: "name" }
+            ],
+            currency: "COP",
+            rateLabel: '1 USD = 4,200 COP' 
+        },
+        mxn_bank: { 
+            title: "Transferencia Bancaria",
+            rateUsd: 20.5, 
+            display: "Bancoppel",
+            svgIcon: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="method-logo-svg">
+                <rect width="100" height="100" fill="#0A2A7A" />
+                <circle cx="34" cy="50" r="16" fill="#F4C300" />
+                <circle cx="62" cy="50" r="10" fill="#F4C300" />
+                <circle cx="86" cy="50" r="10" fill="#F4C300" />
+            </svg>`, 
+            data: [
+                { label: "CLABE", value: "137190104677104652", copyable: true, type: "number" },
+                { label: "Institución", value: "Bancoppel", copyable: false, type: "name" },
+                { label: "Titular", value: "Luis Enrique Moya", copyable: false, type: "name" }
+            ],
+            currency: "MXN",
+            rateLabel: '1 USD = 20.5 MXN'
+        }
+    };
+
+    let selectedMethod = null; 
+
+    const detailsContainer = document.getElementById('account-details-container');
+    const form = document.getElementById('payment-form');
+    const feedbackMessage = document.getElementById('feedback-message');
+    const verifyButton = document.getElementById('verify-button');
+    const fileUpload = document.getElementById('file-upload');
+    const fileNameSpan = document.getElementById('file-name');
+    const optionsContainer = document.getElementById('payment-options-container');
+    const userIdDisplay = document.getElementById('user-id-display'); 
+    const successModal = document.getElementById('payment-success-modal');
+    const modalRedirectText = document.getElementById('modal-redirect-text');
+    const nextStepsContainer = document.getElementById('next-steps-container');
+
+    function getOrCreateUserID() {
+        let userId = localStorage.getItem('user_unique_id');
+        if (!userId) {
+            userId = crypto.randomUUID().substring(0, 8).toUpperCase(); 
+            localStorage.setItem('user_unique_id', userId);
+        }
+        return userId;
+    }
+
+    function isValidEmail(email) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        return emailRegex.test(email);
+    }
+    
+    function isValidFileType(file) {
+        if (!file) return false;
+        const acceptedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+        return acceptedTypes.includes(file.type);
+    }
+
+    function checkRateLimit() {
+        const lastSubmission = localStorage.getItem('last_payment_submission');
+        const currentTime = Date.now();
+        if (lastSubmission) {
+            const timeElapsed = (currentTime - parseInt(lastSubmission)) / 1000; 
+            if (timeElapsed < COOLDOWN_SECONDS) {
+                const remainingSeconds = Math.ceil(COOLDOWN_SECONDS - timeElapsed); 
+                const remainingMinutes = Math.ceil(remainingSeconds / 60);
+                showFeedback(`Espera ${remainingMinutes} min para enviar otra verificación.`, "error");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function updateRateLimit() {
+        localStorage.setItem('last_payment_submission', Date.now().toString());
+    }
+
+    function showSuccessModal() {
+        successModal.classList.add('show');
+        let countdown = REDIRECT_DELAY_SECONDS;
+        modalRedirectText.innerHTML = `Redirigiendo a la página principal en <span class="text-white font-bold">${countdown}</span>s...`;
+        
+        const interval = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                modalRedirectText.innerHTML = `Redirigiendo a la página principal en <span class="text-white font-bold">${countdown}</span>s...`;
+            } else {
+                clearInterval(interval);
+                window.location.href = REDIRECT_URL;
+            }
+        }, 1000);
+        setTimeout(() => {
+            if (countdown > 0) window.location.href = REDIRECT_URL;
+        }, REDIRECT_DELAY_SECONDS * 1000 + 500); 
+    }
+
+    async function sendTelegramDocument(file, transactionDetails) {
+        const MAX_RETRIES = 3;
+        const currentUserId = getOrCreateUserID(); 
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            const api_url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`;
+            
+            // Construir el string del monto con o sin conversión a USD
+            let montoStr = `${transactionDetails.currency} ${transactionDetails.formattedLocalAmount}`;
+            if (transactionDetails.currency !== 'USD') {
+                montoStr += ` (≈ USD ${transactionDetails.formattedUSDAmount})`;
+            }
+
+            const caption = `
+🚨 NUEVA VERIFICACIÓN DE PAGO 🚨
+*ID de Usuario:* \`${currentUserId}\`
+*Fecha:* ${new Date().toLocaleString('es-ES')}
+*Método:* ${transactionDetails.paymentMethod}
+*Monto:* ${montoStr}
+*Correo del Server:* \`${transactionDetails.serverEmail}\`
+`;
+            const formData = new FormData();
+            formData.append('chat_id', TELEGRAM_CHAT_ID);
+            formData.append('document', file); 
+            formData.append('caption', caption);
+            formData.append('parse_mode', 'Markdown');
+            try {
+                const response = await fetch(api_url, { method: 'POST', body: formData });
+                if (response.ok) return true;
+                else if (response.status === 429 && attempt < MAX_RETRIES) {
+                    await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+                    continue;
+                } else throw new Error('Error API Telegram');
+            } catch (error) {
+                if (attempt === MAX_RETRIES) throw new Error("Fallo en conexión al enviar.");
+            }
+        }
+    }
+
+    const copyToClipboard = (text) => {
+        try {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed'; 
+            textarea.style.opacity = 0; 
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy'); 
+            document.body.removeChild(textarea);
+            showFeedback("Copiado al portapapeles ✓", "success");
+        } catch (err) {
+            showFeedback("Error al copiar", "error");
+        }
+    };
+
+    function showFeedback(message, type = 'info') {
+        feedbackMessage.className = 'mt-8 text-sm font-semibold text-center transition-all bg-black/40 py-3 rounded-xl border backdrop-blur-md';
+        feedbackMessage.textContent = message;
+
+        switch (type) {
+            case 'success': 
+                feedbackMessage.classList.add('text-green-400', 'border-green-500/30'); 
+                break;
+            case 'error': 
+                feedbackMessage.classList.add('text-[var(--accent-red)]', 'border-red-500/30'); 
+                break;
+            case 'loading': 
+                feedbackMessage.classList.add('text-white', 'pulse-text', 'border-white/20'); 
+                break;
+            default: 
+                feedbackMessage.classList.add('text-gray-300', 'border-white/10');
+        }
+        
+        feedbackMessage.classList.remove('hidden');
+        if (type !== 'loading') {
+            setTimeout(() => { feedbackMessage.classList.add('hidden'); }, 4000);
+        }
+    }
+
+    /* RENDERIZADO VISUAL CON NUEVA PÍLDORA DE TASA DE CAMBIO */
+    function displayAccountDetails(method) {
+        const methodData = PAYMENT_ACCOUNTS[method];
+        const essentialData = methodData.data;
+        
+        let html = `<div class="flex flex-col gap-6">`;
+            
+        if (methodData.rateLabel) {
+            const formattedRate = methodData.rateUsd.toLocaleString('es-ES', { minimumFractionDigits: methodData.currency === 'MXN' ? 2 : 0, maximumFractionDigits: methodData.currency === 'MXN' ? 2 : 0 });
+            // Nueva Píldora Elegante Glass con resplandor neón sutil
+            html += `
+            <div class="flex justify-center sm:justify-start mb-2 w-full">
+                <div class="relative group inline-block">
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-[var(--accent-red)] to-red-900 rounded-full blur opacity-25 transition duration-500"></div>
+                    <div class="relative flex items-center gap-2.5 bg-[#18181e]/90 border border-white/10 backdrop-blur-xl px-5 py-2 rounded-full shadow-lg">
+                        <div class="w-5 h-5 rounded-full bg-[var(--accent-red)]/20 flex items-center justify-center border border-[var(--accent-red)]/30">
+                            <i class="fas fa-exchange-alt text-[var(--accent-red)] text-[9px]"></i>
+                        </div>
+                        <span class="text-gray-300 text-xs font-semibold tracking-wide">Referencia: <span class="text-white font-bold ml-1">1 USD</span> <span class="text-[var(--accent-red)] mx-1">=</span> <span class="text-white font-bold">${formattedRate} ${methodData.currency}</span></span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        html += `<div class="space-y-3">`; 
+        
+        essentialData.forEach(item => { 
+            let valueClass = 'text-white text-sm font-bold tracking-wide';
+            let clickAction = '';
+            
+            if(item.type === 'number') {
+                valueClass = 'text-white text-sm font-mono font-bold tracking-wider cursor-pointer hover:text-[var(--accent-red)] transition-colors flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10 hover:border-[var(--accent-red)]/50';
+                clickAction = `onclick="copyToClipboard('${item.value}')" title="Copiar"`;
+            }
+
+            html += `
+            <div class="glass-element p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 border border-white/10 hover:border-white/20 transition-colors">
+                <span class="text-gray-300 text-xs font-semibold uppercase tracking-wider">${item.label}</span>
+                <span class="${valueClass}" ${clickAction}>
+                    ${item.value}
+                    ${item.type === 'number' ? '<i class="far fa-copy text-gray-400 hover:text-white transition-colors text-xs ml-1"></i>' : ''}
+                </span>
+            </div>
+            `;
+        });
+
+        html += `</div></div>`;
+        detailsContainer.innerHTML = html;
+    }
+
+    function renderPaymentOptions() {
+        const methods = Object.keys(PAYMENT_ACCOUNTS);
+        optionsContainer.innerHTML = ''; 
+        
+        methods.forEach(methodKey => {
+            const method = PAYMENT_ACCOUNTS[methodKey];
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'glass-element method-option flex flex-col items-center justify-center p-5 w-full cursor-pointer text-gray-400 hover:text-white group transition-all duration-300';
+            button.dataset.method = methodKey;
+            
+            button.innerHTML = `
+                <div class="method-icon-container mb-4 relative">
+                    ${method.svgIcon}
+                </div>
+                <span class="text-sm font-semibold tracking-wide transition-colors duration-300">${method.display}</span>
+            `;
+            
+            button.addEventListener('click', () => {
+                selectedMethod = methodKey;
+                
+                document.querySelectorAll('.method-option').forEach(btn => {
+                    btn.classList.remove('selected', 'text-white');
+                    btn.classList.add('text-gray-400');
+                });
+                
+                button.classList.add('selected', 'text-white');
+                button.classList.remove('text-gray-400');
+
+                displayAccountDetails(methodKey);
+                
+                // Limpiar el campo de monto al cambiar de método para resetear el formato
+                document.getElementById('amount').value = '';
+
+                if (nextStepsContainer.classList.contains('hidden')) {
+                    nextStepsContainer.classList.remove('hidden');
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            nextStepsContainer.classList.remove('opacity-0', 'translate-y-4');
+                            nextStepsContainer.classList.add('opacity-100', 'translate-y-0');
+                        });
+                    });
+                }
+            });
+            
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        
+        if (document.getElementById('hp-field').value) return;
+        if (!checkRateLimit()) return;
+        
+        const serverEmail = document.getElementById('server-email').value.trim();
+        const rawAmountStr = document.getElementById('amount').value;
+        const file = fileUpload.files[0];
+        
+        if (!selectedMethod) { showFeedback("Selecciona un método de pago", "error"); return; }
+        if (!isValidEmail(serverEmail)) { showFeedback("Correo no válido", "error"); return; }
+        
+        const methodData = PAYMENT_ACCOUNTS[selectedMethod];
+        
+        // Convertir el texto formateado (ej. 20.000 o 1,500.50) a un número real para la computadora
+        let amount;
+        if (methodData.currency === 'COP') {
+            amount = parseFloat(rawAmountStr.replace(/\./g, '')); // Quitar los puntos de miles en COP
+        } else {
+            amount = parseFloat(rawAmountStr.replace(/,/g, '')); // Quitar las comas de miles en USD/MXN
+        }
+
+        if (isNaN(amount) || amount <= 0) { showFeedback("Monto no válido", "error"); return; }
+        
+        let amountInUSD = methodData.rateUsd ? amount / methodData.rateUsd : amount;
+
+        if (amountInUSD < MIN_RECHARGE_USD) {
+            showFeedback(`Mínimo requerido: ${MIN_RECHARGE_USD} USD`, "error");
+            return;
+        }
+
+        if (!file || file.size === 0) { showFeedback("Adjunta tu comprobante", "error"); return; }
+        if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { showFeedback("El archivo excede los 5MB", "error"); return; }
+        if (!isValidFileType(file)) { showFeedback("Formato no válido (Solo JPG/PNG/PDF)", "error"); return; }
+
+        verifyButton.disabled = true;
+        verifyButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...';
+        showFeedback('Procesando comprobante...', 'loading');
+        
+        // Formateo avanzado de números para Telegram
+        const formattedLocalAmount = amount.toLocaleString('es-CO', {
+            minimumFractionDigits: methodData.currency === 'COP' ? 0 : 2,
+            maximumFractionDigits: methodData.currency === 'COP' ? 0 : 2
+        });
+        
+        const formattedUSDAmount = amountInUSD.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        const transactionDetails = {
+            paymentMethod: methodData.display,
+            currency: methodData.currency,
+            formattedLocalAmount: formattedLocalAmount,
+            formattedUSDAmount: formattedUSDAmount,
+            serverEmail: serverEmail
+        };
+
+        try {
+            const success = await sendTelegramDocument(file, transactionDetails);
+            if (success) {
+                updateRateLimit(); 
+                feedbackMessage.classList.add('hidden');
+                showSuccessModal(); 
+                form.reset();
+                fileNameSpan.textContent = 'Adjuntar JPG, PNG o PDF';
+                fileNameSpan.classList.remove('text-white');
+                document.querySelector('#file-label div').classList.remove('bg-[var(--accent-red)]', 'border-[var(--accent-red)]');
+                document.querySelector('#file-label i').classList.remove('text-white');
+                document.querySelector('#file-label i').classList.add('text-gray-300');
+            } else {
+                 showFeedback("Fallo de envío. Intenta más tarde.", "error");
+            }
+        } catch (error) {
+            showFeedback(error.message, "error");
+        } finally {
+            if (!successModal.classList.contains('show')) {
+                verifyButton.disabled = false;
+                verifyButton.innerHTML = '<span>Completar Pago</span> <i class="fas fa-arrow-right text-sm"></i>';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderPaymentOptions();
+        
+        // Lógica para formatear el monto de forma dinámica mientras el usuario escribe
+        const amountInput = document.getElementById('amount');
+        amountInput.addEventListener('input', function(e) {
+            if (!selectedMethod) return;
+            const currency = PAYMENT_ACCOUNTS[selectedMethod].currency;
+
+            if (currency === 'COP') {
+                // Formato Pesos Colombianos: Elimina letras y separa por puntos los miles
+                let val = this.value.replace(/\D/g, '');
+                this.value = val ? parseInt(val, 10).toLocaleString('es-CO') : '';
+            } else {
+                // Formato USD y MXN: Separador de miles por coma y permite hasta 2 decimales
+                let val = this.value.replace(/[^0-9.]/g, ''); 
+                let parts = val.split('.');
+                if (parts.length > 2) parts = [parts[0], parts.slice(1).join('')]; 
+                
+                let intPart = parts[0].replace(/\D/g, '');
+                if (intPart) intPart = parseInt(intPart, 10).toLocaleString('en-US'); 
+                
+                if (parts.length > 1) {
+                    this.value = intPart + '.' + parts[1].substring(0, 2); // Limita a 2 decimales
+                } else {
+                    this.value = val.endsWith('.') ? intPart + '.' : intPart; // Permite escribir el punto
+                }
+            }
+        });
+        
+        fileUpload.addEventListener('change', () => {
+            const file = fileUpload.files[0];
+            const iconContainer = document.querySelector('#file-label div');
+            const icon = document.querySelector('#file-label i');
+            if (file) {
+                fileNameSpan.textContent = file.name;
+                fileNameSpan.classList.add('text-white');
+                iconContainer.classList.add('bg-[var(--accent-red)]', 'border-[var(--accent-red)]');
+                icon.classList.remove('text-gray-300');
+                icon.classList.add('text-white');
+                if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) showFeedback("Archivo muy pesado.", "error");
+                else if (!isValidFileType(file)) showFeedback("Formato inválido.", "error");
+                else feedbackMessage.classList.add('hidden'); 
+            } else {
+                fileNameSpan.textContent = 'Adjuntar JPG, PNG o PDF';
+                fileNameSpan.classList.remove('text-white');
+                iconContainer.classList.remove('bg-[var(--accent-red)]', 'border-[var(--accent-red)]');
+                icon.classList.add('text-gray-300');
+                icon.classList.remove('text-white');
+            }
+        });
+
+        form.addEventListener('submit', handleFormSubmit);
+        
+        const userId = getOrCreateUserID();
+        userIdDisplay.textContent = userId;
+        userIdDisplay.addEventListener('click', () => copyToClipboard(userId));
+    });
+
+    window.copyToClipboard = copyToClipboard;
+</script>
+
+</body>
+</html>
