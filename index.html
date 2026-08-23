@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>AutoPay wYMagicServer</title> 
-
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
 <style>
     :root {
         --accent-red: #ff3b30;
@@ -30,9 +27,6 @@
         -moz-osx-font-smoothing: grayscale;
     }
 
-    /* =========================================
-       FONDO ANIMADO ULTRARRÁPIDO (Cero Lag)
-       ========================================= */
     .bg-blobs {
         position: fixed;
         top: 0; left: 0; width: 100vw; height: 100vh;
@@ -60,9 +54,6 @@
         100% { transform: translate3d(-5%, -5%, 0) scale(0.95); }
     }
 
-    /* =========================================
-       GLASSMORPHISM OPTIMIZADO
-       ========================================= */
     .glass-master {
         background: var(--glass-panel);
         backdrop-filter: blur(24px);
@@ -82,7 +73,6 @@
         border-color: rgba(255, 255, 255, 0.2);
     }
 
-    /* TARJETAS DE PAGO */
     .method-option {
         border-radius: 16px;
         transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
@@ -136,7 +126,6 @@
         transform: scale(1.02);
     }
 
-    /* INPUTS */
     .glass-input {
         background: rgba(0, 0, 0, 0.15); 
         border: 1px solid rgba(255, 255, 255, 0.12);
@@ -153,17 +142,15 @@
         box-shadow: 0 0 0 1px var(--accent-red), 0 0 15px rgba(255, 59, 48, 0.15);
     }
 
-    /* Ocultar las flechas selectoras del input de números */
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
     input[type="number"] {
-        -moz-appearance: textfield; /* Para Firefox */
+        -moz-appearance: textfield;
     }
 
-    /* BOTÓN PRINCIPAL */
     .glass-btn {
         background: #ffffff;
         color: #000000;
@@ -190,7 +177,6 @@
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
     .file-input { opacity: 0; position: absolute; z-index: -1; width: 0; height: 0; }
 
-    /* MODAL */
     .modal-backdrop {
         position: fixed; inset: 0;
         background: rgba(0, 0, 0, 0.6); 
@@ -218,24 +204,16 @@
 </head>
 <body class="flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
 
-<!-- FONDO FLUIDO OPTIMIZADO -->
 <div class="bg-blobs">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
 </div>
 
-<!-- ==========================================
-     VENTANA MODAL REDISEÑADA (Más elegante)
-     ========================================== -->
 <div id="payment-success-modal" class="modal-backdrop">
     <div class="modal-content glass-master w-full max-w-md p-10 rounded-[2rem] text-center relative border-none">
-        
-        <!-- Icono central brillante con el efecto rojo -->
         <div class="relative w-24 h-24 mx-auto mb-6">
-            <!-- Aura sutil roja -->
             <div class="absolute inset-0 bg-[var(--accent-red)] rounded-full blur-xl opacity-20 pulse-text"></div>
-            <!-- Esfera de cristal con destello rojo -->
             <div class="relative w-full h-full glass-element rounded-full flex items-center justify-center border border-[var(--accent-red)]/30 shadow-[0_0_20px_rgba(255,59,48,0.15)]">
                 <i class="fas fa-check text-[var(--accent-red)] text-4xl"></i>
             </div>
@@ -243,13 +221,11 @@
 
         <h3 class="text-3xl text-white mb-3 font-bold tracking-tight">¡Pago Enviado!</h3>
         
-        <!-- Píldora de estado -->
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-element border border-white/10 mb-8">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]"></span>
             <span class="text-gray-300 font-medium text-xs tracking-wide">El pago fue enviado correctamente, El saldo se agrega en segundos</span>
         </div>
 
-        <!-- Caja de aviso completamente limpia y transparente (Sin bordes neón) -->
         <div class="text-left glass-element p-5 rounded-2xl mb-8 border border-white/10">
             <div class="flex items-start gap-3">
                 <i class="fas fa-info-circle text-gray-400 mt-0.5"></i>
@@ -268,17 +244,13 @@
     </div>
 </div>
 
-<!-- CONTENEDOR PRINCIPAL -->
 <div id="payment-card" class="glass-master w-full max-w-3xl p-8 sm:p-12 rounded-[2.5rem] relative z-10">
-    
-    <!-- ENCABEZADO -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
         <div>
             <div class="flex items-baseline gap-3 mb-1">
                 <h1 class="text-4xl sm:text-5xl text-white font-bold tracking-tight">AutoPay</h1>
             </div>
             <div class="flex items-center gap-2 mt-2">
-                <!-- Se eliminó la clase 'uppercase' para que respete wYMagicServer -->
                 <span class="text-[var(--accent-red)] text-sm font-bold tracking-widest">wYMagicServer</span>
                 <span class="text-gray-400 text-xs font-medium">| Best GSM Services</span>
             </div>
@@ -291,44 +263,32 @@
     </div>
     
     <form id="payment-form" class="space-y-10">
-        <!-- HONEYPOT FIELD -->
         <div style="display:none;">
             <input type="text" id="hp-field" name="website" tabindex="-1" autocomplete="off">
         </div>
         
-        <!-- PASO 1: SELECCIÓN -->
         <div>
             <div class="flex justify-between items-end mb-6">
                 <h3 class="text-xl text-white font-semibold tracking-tight">
                     <span class="text-[var(--accent-red)] mr-2 font-bold">Paso 1</span> Elije tu método de pago
                 </h3>
-                <span class="text-gray-300 text-xs font-semibold bg-white/5 px-3 py-1 rounded-full border border-white/10">Mínimo 3 USD</span>
+                <span class="text-gray-300 text-xs font-semibold bg-white/5 px-3 py-1 rounded-full border border-white/10">Mínimo 5 USD</span>
             </div>
-
-            <!-- Botones JS -->
             <div id="payment-options-container" class="grid grid-cols-1 sm:grid-cols-3 gap-5">
             </div>
         </div>
         
-        <!-- PASOS 2 Y 3 -->
         <div id="next-steps-container" class="hidden opacity-0 translate-y-4 transition-[opacity,transform] duration-300 ease-out space-y-10">
-            
             <div class="glass-divider"></div>
-
-            <!-- PASO 2: DETALLES -->
             <div>
                 <h3 class="text-xl text-white font-semibold tracking-tight mb-6">
                     <span class="text-[var(--accent-red)] mr-2 font-bold">Paso 2</span> Datos de pago
                 </h3>
-
                 <div id="account-details-container" class="pl-0 sm:pl-8">
-                    <!-- Detalles JS -->
                 </div>
             </div>
 
             <div class="glass-divider"></div>
-
-            <!-- PASO Final: CONFIRMACIÓN -->
             <div>
                 <h3 class="text-xl text-white font-semibold tracking-tight mb-6">
                     <span class="text-[var(--accent-red)] mr-2 font-bold">Paso Final</span> Confirmación
@@ -337,12 +297,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 pl-0 sm:pl-8">
                     <div>
                         <label for="server-email" class="block text-gray-200 text-xs font-semibold mb-2 ml-1 tracking-wide uppercase">Correo de tu cuenta del server</label>
-                        <input type="email" id="server-email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}" placeholder="ejemplo@correo.com" class="glass-input w-full p-4" required>
+                        <input type="email" id="server-email" placeholder="ejemplo@correo.com" class="glass-input w-full p-4" required>
                     </div>
 
                     <div>
                         <label for="amount" class="block text-gray-200 text-xs font-semibold mb-2 ml-1 tracking-wide uppercase">Monto transferido</label>
-                        <!-- Se cambia type="number" a type="text" con inputmode="decimal" para permitir el formateo en vivo -->
                         <input type="text" id="amount" inputmode="decimal" placeholder="0.00" class="glass-input w-full p-4" required>
                     </div>
                 </div>
@@ -370,10 +329,8 @@
         </div>
     </form>
     
-    <!-- Mensajes Feedback -->
     <div id="feedback-message" class="mt-8 text-sm font-semibold text-center hidden bg-black/40 py-3 rounded-xl border border-white/10 backdrop-blur-md"></div>
 
-    <!-- Pie de página -->
     <div class="mt-12 pt-6 border-t border-white/5 flex flex-col items-center gap-2">
         <a href="https://wa.me/message/K3NUVQUXNQGDL1" target="_blank" class="text-gray-400 hover:text-white text-sm font-medium transition-colors flex items-center gap-2">
             <i class="fab fa-whatsapp text-green-500"></i> Contactar a soporte
@@ -384,9 +341,6 @@
 </div>
 
 <script>
-    // =========================================================================
-    // SEGURIDAD: Token ofuscado para evitar que bots en Vercel lo roben y hagan spam
-    // =========================================================================
     const _t1 = "8376859170:";
     const _t2 = "AAFuVLy2wmY4nL";
     const _t3 = "NOMmyBh-Vkhr8f1hVeN5A";
@@ -398,7 +352,7 @@
     const REDIRECT_DELAY_SECONDS = 20; 
     const MAX_FILE_SIZE_MB = 5; 
     const COOLDOWN_SECONDS = 420; 
-    const MIN_RECHARGE_USD = 3;
+    const MIN_RECHARGE_USD = 5; 
 
     const PAYMENT_ACCOUNTS = {
         binance_pay: { 
@@ -422,7 +376,7 @@
         },
         nequi: {
             title: "Nequi / Daviplata", 
-            rateUsd: 4000, 
+            rateUsd: 3600, 
             display: "Nequi / Daviplata", 
             svgIcon: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="method-logo-svg">
                 <rect width="100" height="100" fill="#FFFFFF" />
@@ -434,11 +388,11 @@
                 { label: "Titular", value: "Yeandri Sevilla", copyable: false, type: "name" }
             ],
             currency: "COP",
-            rateLabel: '1 USD = 4,200 COP' 
+            rateLabel: '1 USD = 3,600 COP' 
         },
         mxn_bank: { 
             title: "Transferencia Bancaria",
-            rateUsd: 20.5, 
+            rateUsd: 20, 
             display: "Bancoppel",
             svgIcon: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="method-logo-svg">
                 <rect width="100" height="100" fill="#0A2A7A" />
@@ -452,11 +406,12 @@
                 { label: "Titular", value: "FFFFFFFFFFFFFF", copyable: false, type: "name" }
             ],
             currency: "MXN",
-            rateLabel: '1 USD = 20.5 MXN'
+            rateLabel: '1 USD = 20 MXN'
         }
     };
 
     let selectedMethod = null; 
+    let feedbackTimeout = null;
 
     const detailsContainer = document.getElementById('account-details-container');
     const form = document.getElementById('payment-form');
@@ -480,7 +435,7 @@
     }
 
     function isValidEmail(email) {
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailRegex.test(email);
     }
     
@@ -523,9 +478,6 @@
                 window.location.href = REDIRECT_URL;
             }
         }, 1000);
-        setTimeout(() => {
-            if (countdown > 0) window.location.href = REDIRECT_URL;
-        }, REDIRECT_DELAY_SECONDS * 1000 + 500); 
     }
 
     async function sendTelegramDocument(file, transactionDetails) {
@@ -534,7 +486,6 @@
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             const api_url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`;
             
-            // Construir el string del monto con o sin conversión a USD
             let montoStr = `${transactionDetails.currency} ${transactionDetails.formattedLocalAmount}`;
             if (transactionDetails.currency !== 'USD') {
                 montoStr += ` (≈ USD ${transactionDetails.formattedUSDAmount})`;
@@ -583,6 +534,7 @@
     };
 
     function showFeedback(message, type = 'info') {
+        clearTimeout(feedbackTimeout);
         feedbackMessage.className = 'mt-8 text-sm font-semibold text-center transition-all bg-black/40 py-3 rounded-xl border backdrop-blur-md';
         feedbackMessage.textContent = message;
 
@@ -602,11 +554,10 @@
         
         feedbackMessage.classList.remove('hidden');
         if (type !== 'loading') {
-            setTimeout(() => { feedbackMessage.classList.add('hidden'); }, 4000);
+            feedbackTimeout = setTimeout(() => { feedbackMessage.classList.add('hidden'); }, 4000);
         }
     }
 
-    /* RENDERIZADO VISUAL CON NUEVA PÍLDORA DE TASA DE CAMBIO */
     function displayAccountDetails(method) {
         const methodData = PAYMENT_ACCOUNTS[method];
         const essentialData = methodData.data;
@@ -615,7 +566,6 @@
             
         if (methodData.rateLabel) {
             const formattedRate = methodData.rateUsd.toLocaleString('es-ES', { minimumFractionDigits: methodData.currency === 'MXN' ? 2 : 0, maximumFractionDigits: methodData.currency === 'MXN' ? 2 : 0 });
-            // Nueva Píldora Elegante Glass con resplandor neón sutil
             html += `
             <div class="flex justify-center sm:justify-start mb-2 w-full">
                 <div class="relative group inline-block">
@@ -687,7 +637,6 @@
 
                 displayAccountDetails(methodKey);
                 
-                // Limpiar el campo de monto al cambiar de método para resetear el formato
                 document.getElementById('amount').value = '';
 
                 if (nextStepsContainer.classList.contains('hidden')) {
@@ -720,12 +669,11 @@
         
         const methodData = PAYMENT_ACCOUNTS[selectedMethod];
         
-        // Convertir el texto formateado (ej. 20.000 o 1,500.50) a un número real para la computadora
         let amount;
         if (methodData.currency === 'COP') {
-            amount = parseFloat(rawAmountStr.replace(/\./g, '')); // Quitar los puntos de miles en COP
+            amount = parseFloat(rawAmountStr.replace(/\./g, '')); 
         } else {
-            amount = parseFloat(rawAmountStr.replace(/,/g, '')); // Quitar las comas de miles en USD/MXN
+            amount = parseFloat(rawAmountStr.replace(/,/g, '')); 
         }
 
         if (isNaN(amount) || amount <= 0) { showFeedback("Monto no válido", "error"); return; }
@@ -745,7 +693,6 @@
         verifyButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...';
         showFeedback('Procesando comprobante...', 'loading');
         
-        // Formateo avanzado de números para Telegram
         const formattedLocalAmount = amount.toLocaleString('es-CO', {
             minimumFractionDigits: methodData.currency === 'COP' ? 0 : 2,
             maximumFractionDigits: methodData.currency === 'COP' ? 0 : 2
@@ -792,18 +739,15 @@
     document.addEventListener('DOMContentLoaded', () => {
         renderPaymentOptions();
         
-        // Lógica para formatear el monto de forma dinámica mientras el usuario escribe
         const amountInput = document.getElementById('amount');
         amountInput.addEventListener('input', function(e) {
             if (!selectedMethod) return;
             const currency = PAYMENT_ACCOUNTS[selectedMethod].currency;
 
             if (currency === 'COP') {
-                // Formato Pesos Colombianos: Elimina letras y separa por puntos los miles
                 let val = this.value.replace(/\D/g, '');
                 this.value = val ? parseInt(val, 10).toLocaleString('es-CO') : '';
             } else {
-                // Formato USD y MXN: Separador de miles por coma y permite hasta 2 decimales
                 let val = this.value.replace(/[^0-9.]/g, ''); 
                 let parts = val.split('.');
                 if (parts.length > 2) parts = [parts[0], parts.slice(1).join('')]; 
@@ -812,9 +756,9 @@
                 if (intPart) intPart = parseInt(intPart, 10).toLocaleString('en-US'); 
                 
                 if (parts.length > 1) {
-                    this.value = intPart + '.' + parts[1].substring(0, 2); // Limita a 2 decimales
+                    this.value = intPart + '.' + parts[1].substring(0, 2); 
                 } else {
-                    this.value = val.endsWith('.') ? intPart + '.' : intPart; // Permite escribir el punto
+                    this.value = val.endsWith('.') ? intPart + '.' : intPart; 
                 }
             }
         });
