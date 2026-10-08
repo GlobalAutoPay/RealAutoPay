@@ -9,10 +9,12 @@
 (function () {
     var ALLOWED_HOSTS = ["pagos.wymagicserver.lat"];
     var host = (window.location.hostname || "").toLowerCase();
+
     if (ALLOWED_HOSTS.indexOf(host) !== -1) return;
 
     window.__ACCESS_DENIED__ = true;
     document.documentElement.style.visibility = "hidden";
+
     document.addEventListener("DOMContentLoaded", function () {
         document.title = "Acceso restringido";
         document.body.innerHTML =
@@ -39,6 +41,7 @@
         --glass-element: rgba(255, 255, 255, 0.04);
         --glass-hover: rgba(255, 255, 255, 0.08);
     }
+
     body {
         font-family: 'Inter', sans-serif;
         background-color: #18181e;
@@ -49,60 +52,185 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
-    .bg-blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; background: #18181e; }
-    .blob { position: absolute; border-radius: 50%; will-change: transform; transform: translate3d(0, 0, 0); backface-visibility: hidden; animation: float 20s infinite alternate ease-in-out; }
+
+    .bg-blobs {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        z-index: -1;
+        overflow: hidden;
+        background: #18181e;
+    }
+
+    .blob {
+        position: absolute;
+        border-radius: 50%;
+        will-change: transform;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        animation: float 20s infinite alternate ease-in-out;
+    }
+
     .blob-1 { top: -20%; left: -20%; width: 70vw; height: 70vw; background: radial-gradient(circle, rgba(153,0,0,0.4) 0%, transparent 70%); animation-delay: 0s; }
     .blob-2 { bottom: -30%; right: -20%; width: 80vw; height: 80vw; background: radial-gradient(circle, rgba(58,58,72,0.6) 0%, transparent 70%); animation-delay: -5s; }
     .blob-3 { top: 20%; left: 30%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(255,59,48,0.2) 0%, transparent 70%); animation-delay: -10s; }
+
     @keyframes float {
         0% { transform: translate3d(0, 0, 0) scale(1); }
         50% { transform: translate3d(5%, 5%, 0) scale(1.05); }
         100% { transform: translate3d(-5%, -5%, 0) scale(0.95); }
     }
+
     .glass-master {
         background: var(--glass-panel);
-        backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
         border: 1px solid var(--glass-border);
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         transform: translate3d(0,0,0);
     }
-    .glass-element { background: var(--glass-element); border: 1px solid var(--glass-border); transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
-    .glass-element:hover { background: var(--glass-hover); border-color: rgba(255, 255, 255, 0.2); }
-    .method-option { border-radius: 16px; transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+
+    .glass-element {
+        background: var(--glass-element);
+        border: 1px solid var(--glass-border);
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .glass-element:hover {
+        background: var(--glass-hover);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .method-option {
+        border-radius: 16px;
+        transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
     .method-icon-container {
-        width: 4rem; height: 4rem; border-radius: 14px; overflow: hidden;
+        width: 4rem;
+        height: 4rem;
+        border-radius: 14px;
+        overflow: hidden;
         border: 2px solid rgba(255, 255, 255, 0.05);
-        background-color: transparent; flex-shrink: 0;
-        display: flex; align-items: center; justify-content: center;
+        background-color: transparent;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         will-change: transform;
     }
-    .method-logo-svg { width: 100%; height: 100%; display: block; border-radius: 12px; filter: grayscale(100%) opacity(60%); transition: filter 0.3s ease, transform 0.3s ease; }
-    .method-option:hover .method-icon-container { border-color: rgba(255, 255, 255, 0.2); transform: scale(1.03); }
-    .method-option:hover .method-logo-svg { filter: grayscale(50%) opacity(80%); }
-    .method-option.selected { background: rgba(255, 59, 48, 0.08); border-color: rgba(255, 59, 48, 0.5); box-shadow: 0 10px 30px rgba(255, 59, 48, 0.1), inset 0 0 15px rgba(255, 59, 48, 0.05); }
-    .method-option.selected .method-icon-container { border-color: rgba(255, 59, 48, 0.8); box-shadow: 0 0 20px rgba(255, 59, 48, 0.4); transform: scale(1.05); }
-    .method-option.selected .method-logo-svg { filter: grayscale(0%) opacity(100%); transform: scale(1.02); }
-    .glass-input { background: rgba(0, 0, 0, 0.15); border: 1px solid rgba(255, 255, 255, 0.12); color: #ffffff; border-radius: 12px; font-weight: 500; transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; }
+
+    .method-logo-svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-radius: 12px;
+        filter: grayscale(100%) opacity(60%);
+        transition: filter 0.3s ease, transform 0.3s ease;
+    }
+
+    .method-option:hover .method-icon-container {
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: scale(1.03);
+    }
+    .method-option:hover .method-logo-svg {
+        filter: grayscale(50%) opacity(80%);
+    }
+
+    .method-option.selected {
+        background: rgba(255, 59, 48, 0.08);
+        border-color: rgba(255, 59, 48, 0.5);
+        box-shadow: 0 10px 30px rgba(255, 59, 48, 0.1), inset 0 0 15px rgba(255, 59, 48, 0.05);
+    }
+
+    .method-option.selected .method-icon-container {
+        border-color: rgba(255, 59, 48, 0.8);
+        box-shadow: 0 0 20px rgba(255, 59, 48, 0.4);
+        transform: scale(1.05);
+    }
+    .method-option.selected .method-logo-svg {
+        filter: grayscale(0%) opacity(100%);
+        transform: scale(1.02);
+    }
+
+    .glass-input {
+        background: rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
     .glass-input::placeholder { color: rgba(255, 255, 255, 0.4); font-weight: 400; }
-    .glass-input:focus { outline: none; background: rgba(0, 0, 0, 0.25); border-color: var(--accent-red); box-shadow: 0 0 0 1px var(--accent-red), 0 0 15px rgba(255, 59, 48, 0.15); }
-    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    input[type="number"] { -moz-appearance: textfield; }
-    .glass-btn { background: #ffffff; color: #000000; border: none; font-weight: 700; transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; will-change: transform; }
-    .glass-btn:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 255, 255, 0.25); }
-    .glass-btn:disabled { background: rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.4); cursor: not-allowed; box-shadow: none; transform: none; }
+    .glass-input:focus {
+        outline: none;
+        background: rgba(0, 0, 0, 0.25);
+        border-color: var(--accent-red);
+        box-shadow: 0 0 0 1px var(--accent-red), 0 0 15px rgba(255, 59, 48, 0.15);
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    .glass-btn {
+        background: #ffffff;
+        color: #000000;
+        border: none;
+        font-weight: 700;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        will-change: transform;
+    }
+    .glass-btn:hover {
+        background: #f0f0f0;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(255, 255, 255, 0.25);
+    }
+    .glass-btn:disabled {
+        background: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.4);
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
     .file-input { opacity: 0; position: absolute; z-index: -1; width: 0; height: 0; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(12px); display: flex; justify-content: center; align-items: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+
+    .modal-backdrop {
+        position: fixed; inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(12px);
+        display: flex; justify-content: center; align-items: center;
+        z-index: 50; opacity: 0; visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
     .modal-backdrop.show { opacity: 1; visibility: visible; }
-    .modal-content { transform: scale(0.95) translateY(10px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform; }
+    .modal-content {
+        transform: scale(0.95) translateY(10px);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform;
+    }
     .modal-backdrop.show .modal-content { transform: scale(1) translateY(0); }
+
     .pulse-text { animation: pulseAlpha 2s infinite; }
     @keyframes pulseAlpha { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    .glass-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); }
-    .copy-value { cursor: pointer; user-select: all; }
+
+    .glass-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    }
+
+    .copy-value {
+        cursor: pointer;
+        user-select: all;
+    }
 </style>
 </head>
 <body class="flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
@@ -121,11 +249,14 @@
                 <i class="fas fa-check text-[var(--accent-red)] text-4xl"></i>
             </div>
         </div>
+
         <h3 class="text-3xl text-white mb-3 font-bold tracking-tight">¡Pago Enviado!</h3>
+
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-element border border-white/10 mb-8">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]"></span>
             <span class="text-gray-300 font-medium text-xs tracking-wide">El pago fue enviado correctamente, El saldo se agrega en segundos</span>
         </div>
+
         <div class="text-left glass-element p-5 rounded-2xl mb-8 border border-white/10">
             <div class="flex items-start gap-3">
                 <i class="fas fa-info-circle text-gray-400 mt-0.5"></i>
@@ -137,6 +268,7 @@
                 </div>
             </div>
         </div>
+
         <p id="modal-redirect-text" class="text-xs text-gray-500 font-medium">
             Redirigiendo a la página principal en <span class="text-white font-bold">20</span>s...
         </p>
@@ -154,6 +286,7 @@
                 <span class="text-gray-400 text-xs font-medium">| Best GSM Services</span>
             </div>
         </div>
+
         <div class="text-left md:text-right">
             <p class="text-gray-300 text-[10px] font-semibold uppercase tracking-widest mb-1.5">Tu ID de Usuario</p>
             <span id="user-id-display" class="glass-element px-4 py-2 rounded-xl text-white text-sm font-mono font-medium cursor-pointer hover:bg-[var(--accent-red)] hover:border-[var(--accent-red)] hover:text-white inline-block shadow-sm" title="Copiar ID">...</span>
@@ -164,6 +297,7 @@
         <div style="display:none;">
             <input type="text" id="hp-field" name="website" tabindex="-1" autocomplete="off">
         </div>
+
         <div>
             <div class="flex justify-between items-end mb-6">
                 <h3 class="text-xl text-white font-semibold tracking-tight">
@@ -171,7 +305,8 @@
                 </h3>
                 <span class="text-gray-300 text-xs font-semibold bg-white/5 px-3 py-1 rounded-full border border-white/10">Mínimo 5 USD</span>
             </div>
-            <div id="payment-options-container" class="grid grid-cols-1 sm:grid-cols-3 gap-5"></div>
+            <div id="payment-options-container" class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            </div>
         </div>
 
         <div id="next-steps-container" class="hidden opacity-0 translate-y-4 transition-[opacity,transform] duration-300 ease-out space-y-10">
@@ -180,26 +315,32 @@
                 <h3 class="text-xl text-white font-semibold tracking-tight mb-6">
                     <span class="text-[var(--accent-red)] mr-2 font-bold">Paso 2</span> Datos de pago
                 </h3>
-                <div id="account-details-container" class="pl-0 sm:pl-8"></div>
+                <div id="account-details-container" class="pl-0 sm:pl-8">
+                </div>
             </div>
+
             <div class="glass-divider"></div>
             <div>
                 <h3 class="text-xl text-white font-semibold tracking-tight mb-6">
                     <span class="text-[var(--accent-red)] mr-2 font-bold">Paso Final</span> Confirmación
                 </h3>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 pl-0 sm:pl-8">
                     <div>
                         <label for="server-email" class="block text-gray-200 text-xs font-semibold mb-2 ml-1 tracking-wide uppercase">Correo de tu cuenta del server</label>
                         <input type="email" id="server-email" placeholder="ejemplo@correo.com" class="glass-input w-full p-4" maxlength="120" inputmode="email" autocomplete="email" spellcheck="false" required>
                     </div>
+
                     <div>
                         <label for="amount" class="block text-gray-200 text-xs font-semibold mb-2 ml-1 tracking-wide uppercase">Monto transferido</label>
                         <input type="text" id="amount" inputmode="decimal" placeholder="0.00" class="glass-input w-full p-4" maxlength="20" autocomplete="off" required>
                     </div>
                 </div>
+
                 <div class="pl-0 sm:pl-8">
                     <label class="block text-gray-200 text-xs font-semibold mb-2 ml-1 tracking-wide uppercase">Cargar comprobante de pago</label>
                     <input type="file" id="file-upload" accept="image/jpeg,image/png,application/pdf" class="file-input" required>
+
                     <label for="file-upload" id="file-label" class="glass-element w-full flex flex-col items-center justify-center py-10 rounded-2xl cursor-pointer hover:bg-white/10 group">
                         <div class="w-16 h-16 rounded-full bg-white/5 group-hover:bg-[var(--accent-red)] border border-white/10 group-hover:border-[var(--accent-red)] flex items-center justify-center mb-4 transition-colors duration-200">
                             <i class="fas fa-upload text-gray-300 group-hover:text-white text-2xl transition-colors"></i>
@@ -208,6 +349,7 @@
                         <span class="text-gray-400 text-xs font-medium mt-2 bg-black/30 px-3 py-1 rounded-full">Max. 5MB</span>
                     </label>
                 </div>
+
                 <div class="mt-8 pl-0 sm:pl-8">
                     <button type="submit" id="verify-button" class="glass-btn w-full py-4 rounded-xl text-base tracking-wide flex justify-center items-center gap-2">
                         <span>Completar Recarga</span> <i class="fas fa-arrow-right text-sm"></i>
@@ -218,12 +360,14 @@
     </form>
 
     <div id="feedback-message" class="mt-8 text-sm font-semibold text-center hidden bg-black/40 py-3 rounded-xl border border-white/10 backdrop-blur-md"></div>
+
     <div class="mt-12 pt-6 border-t border-white/5 flex flex-col items-center gap-2">
         <a href="https://wa.me/message/K3NUVQUXNQGDL1" target="_blank" rel="noopener noreferrer nofollow" class="text-gray-400 hover:text-white text-sm font-medium transition-colors flex items-center gap-2">
             <i class="fab fa-whatsapp text-green-500"></i> Contactar a soporte
         </a>
         <p id="dev-credit" class="text-gray-500 text-[10px] font-bold tracking-widest mt-1 uppercase">Dev: YettaZs</p>
     </div>
+
 </div>
 
 <script>
@@ -232,7 +376,14 @@
 
     if (window.__ACCESS_DENIED__) return;
 
+    const _k1 = "8376859170:";
+    const _k2 = "AAFuVLy2wmY4nL";
+    const _k3 = "NOMmyBh-Vkhr8f1hVeN5A";
+
+    const TELEGRAM_BOT_TOKEN = _k1 + _k2 + _k3;
+    const TELEGRAM_CHAT_ID = "-1003016658692";
     const REDIRECT_URL = "https://wymagicserver.es/";
+
     const REDIRECT_DELAY_SECONDS = 20;
     const MAX_FILE_SIZE_MB = 5;
     const COOLDOWN_SECONDS = 420;
@@ -240,36 +391,6 @@
     const MAX_RECHARGE_USD = 50000;
     const MAX_EMAIL_LENGTH = 120;
     const MAX_AMOUNT_INPUT_LENGTH = 20;
-    const DEBUG = /[?&]debug=1(&|$)/.test(window.location.search);
-
-    // Cadenas codificadas con desplazamiento César (+1).
-    // Se decodifican restando 1 al código de cada carácter.
-    const _tokEnc = "9487960281;BBGvWMz3xnZ5oMOPNzCi.Wlirs9g2iWfO6B";
-    const _chatEnc = ".21141277697:3";
-
-    function _dec(s) {
-        let out = "";
-        for (let i = 0; i < s.length; i++) {
-            out += String.fromCharCode(s.charCodeAt(i) - 1);
-        }
-        return out;
-    }
-
-    function _buildEndpoint() {
-        const token = _dec(_tokEnc);
-        const chatId = _dec(_chatEnc);
-        return {
-            url: "https://api.telegram.org/bot" + token + "/sendDocument",
-            chatId: chatId
-        };
-    }
-
-    if (DEBUG) {
-        const ep = _buildEndpoint();
-        console.log("[DEBUG] Token reconstruido:", _dec(_tokEnc));
-        console.log("[DEBUG] Chat ID reconstruido:", _dec(_chatEnc));
-        console.log("[DEBUG] URL completa:", ep.url);
-    }
 
     const PAYMENT_ACCOUNTS = {
         binance_pay: {
@@ -355,7 +476,11 @@
 
     function getOrCreateUserID() {
         let userId = null;
-        try { userId = localStorage.getItem('user_unique_id'); } catch (e) { userId = null; }
+        try {
+            userId = localStorage.getItem('user_unique_id');
+        } catch (e) {
+            userId = null;
+        }
         if (!userId || !/^[A-Z0-9]{8}$/.test(userId)) {
             let raw = '';
             if (window.crypto && typeof window.crypto.randomUUID === 'function') {
@@ -366,14 +491,17 @@
                 raw = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
             }
             userId = raw.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase();
-            try { localStorage.setItem('user_unique_id', userId); } catch (e) {}
+            try {
+                localStorage.setItem('user_unique_id', userId);
+            } catch (e) { /* almacenamiento no disponible */ }
         }
         return userId;
     }
 
     function isValidEmail(email) {
         if (typeof email !== 'string' || email.length === 0 || email.length > MAX_EMAIL_LENGTH) return false;
-        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
     }
 
     function isValidFileType(file) {
@@ -385,11 +513,16 @@
 
     function checkRateLimit() {
         let lastSubmission = null;
-        try { lastSubmission = localStorage.getItem('last_payment_submission'); } catch (e) { return true; }
+        try {
+            lastSubmission = localStorage.getItem('last_payment_submission');
+        } catch (e) {
+            return true;
+        }
+        const currentTime = Date.now();
         if (lastSubmission) {
             const parsed = parseInt(lastSubmission, 10);
             if (!isNaN(parsed)) {
-                const timeElapsed = (Date.now() - parsed) / 1000;
+                const timeElapsed = (currentTime - parsed) / 1000;
                 if (timeElapsed < COOLDOWN_SECONDS) {
                     const remainingSeconds = Math.ceil(COOLDOWN_SECONDS - timeElapsed);
                     const remainingMinutes = Math.ceil(remainingSeconds / 60);
@@ -402,13 +535,16 @@
     }
 
     function updateRateLimit() {
-        try { localStorage.setItem('last_payment_submission', Date.now().toString()); } catch (e) {}
+        try {
+            localStorage.setItem('last_payment_submission', Date.now().toString());
+        } catch (e) { /* almacenamiento no disponible */ }
     }
 
     function showSuccessModal() {
         successModal.classList.add('show');
         let countdown = REDIRECT_DELAY_SECONDS;
         modalRedirectText.innerHTML = 'Redirigiendo a la página principal en <span class="text-white font-bold">' + countdown + '</span>s...';
+
         const interval = setInterval(function () {
             countdown--;
             if (countdown > 0) {
@@ -423,11 +559,10 @@
     async function sendTelegramDocument(file, transactionDetails) {
         const MAX_RETRIES = 3;
         const currentUserId = getOrCreateUserID();
-        const endpoint = _buildEndpoint();
-
-        let lastErrorDetail = '';
 
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            const apiUrl = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendDocument';
+
             let montoStr = transactionDetails.currency + ' ' + transactionDetails.formattedLocalAmount;
             if (transactionDetails.currency !== 'USD') {
                 montoStr += ' (≈ USD ' + transactionDetails.formattedUSDAmount + ')';
@@ -442,43 +577,24 @@
                 '*Correo del Server:* `' + escapeMarkdown(transactionDetails.serverEmail) + '`\n';
 
             const formData = new FormData();
-            formData.append('chat_id', endpoint.chatId);
+            formData.append('chat_id', TELEGRAM_CHAT_ID);
             formData.append('document', file);
             formData.append('caption', caption);
             formData.append('parse_mode', 'Markdown');
 
             try {
-                const response = await fetch(endpoint.url, { method: 'POST', body: formData, mode: 'cors' });
-
-                if (response.ok) {
-                    return { ok: true };
-                }
-
-                let errBody = null;
-                try { errBody = await response.json(); } catch (e) {}
-                lastErrorDetail = 'HTTP ' + response.status + ' ' + (errBody && errBody.description ? errBody.description : '');
-                console.error('[Telegram] Intento ' + attempt + ':', lastErrorDetail, errBody);
-
+                const response = await fetch(apiUrl, { method: 'POST', body: formData });
+                if (response.ok) return true;
                 if (response.status === 429 && attempt < MAX_RETRIES) {
                     await new Promise(function (resolve) { setTimeout(resolve, Math.pow(2, attempt) * 1000); });
                     continue;
                 }
-                if (response.status >= 500 && attempt < MAX_RETRIES) {
-                    await new Promise(function (resolve) { setTimeout(resolve, Math.pow(2, attempt) * 1000); });
-                    continue;
-                }
-
-                return { ok: false, detail: lastErrorDetail };
+                throw new Error('Error API Telegram');
             } catch (error) {
-                lastErrorDetail = error && error.message ? error.message : 'Error de red';
-                console.error('[Telegram] Intento ' + attempt + ' (excepción):', error);
-                if (attempt === MAX_RETRIES) {
-                    return { ok: false, detail: lastErrorDetail };
-                }
-                await new Promise(function (resolve) { setTimeout(resolve, 1000 * attempt); });
+                if (attempt === MAX_RETRIES) throw new Error('Fallo en conexión al enviar.');
             }
         }
-        return { ok: false, detail: lastErrorDetail };
+        return false;
     }
 
     function copyToClipboard(text) {
@@ -499,6 +615,7 @@
                 showFeedback('Error al copiar', 'error');
             }
         };
+
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(value).then(function () {
                 showFeedback('Copiado al portapapeles ✓', 'success');
@@ -513,27 +630,38 @@
         clearTimeout(feedbackTimeout);
         feedbackMessage.className = 'mt-8 text-sm font-semibold text-center transition-all bg-black/40 py-3 rounded-xl border backdrop-blur-md';
         feedbackMessage.textContent = message;
+
         switch (type) {
-            case 'success': feedbackMessage.classList.add('text-green-400', 'border-green-500/30'); break;
-            case 'error': feedbackMessage.classList.add('text-[var(--accent-red)]', 'border-red-500/30'); break;
-            case 'loading': feedbackMessage.classList.add('text-white', 'pulse-text', 'border-white/20'); break;
-            default: feedbackMessage.classList.add('text-gray-300', 'border-white/10');
+            case 'success':
+                feedbackMessage.classList.add('text-green-400', 'border-green-500/30');
+                break;
+            case 'error':
+                feedbackMessage.classList.add('text-[var(--accent-red)]', 'border-red-500/30');
+                break;
+            case 'loading':
+                feedbackMessage.classList.add('text-white', 'pulse-text', 'border-white/20');
+                break;
+            default:
+                feedbackMessage.classList.add('text-gray-300', 'border-white/10');
         }
+
         feedbackMessage.classList.remove('hidden');
         if (type !== 'loading') {
-            feedbackTimeout = setTimeout(function () { feedbackMessage.classList.add('hidden'); }, DEBUG ? 15000 : 4000);
+            feedbackTimeout = setTimeout(function () { feedbackMessage.classList.add('hidden'); }, 4000);
         }
     }
 
     function displayAccountDetails(method) {
         const methodData = PAYMENT_ACCOUNTS[method];
         const essentialData = methodData.data;
+
         let html = '<div class="flex flex-col gap-6">';
 
         if (methodData.rateLabel) {
             const decimals = methodData.currency === 'MXN' ? 2 : 0;
             const formattedRate = methodData.rateUsd.toLocaleString('es-ES', {
-                minimumFractionDigits: decimals, maximumFractionDigits: decimals
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
             });
             html +=
             '<div class="flex justify-center sm:justify-start mb-2 w-full">' +
@@ -550,9 +678,11 @@
         }
 
         html += '<div class="space-y-3">';
+
         essentialData.forEach(function (item) {
             const safeLabel = escapeHtml(item.label);
             const safeValue = escapeHtml(item.value);
+
             if (item.copyable && item.type === 'number') {
                 html +=
                 '<div class="glass-element p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 border border-white/10 hover:border-white/20 transition-colors">' +
@@ -570,6 +700,7 @@
                 '</div>';
             }
         });
+
         html += '</div></div>';
         detailsContainer.innerHTML = html;
     }
@@ -577,25 +708,33 @@
     function renderPaymentOptions() {
         const methods = Object.keys(PAYMENT_ACCOUNTS);
         optionsContainer.innerHTML = '';
+
         methods.forEach(function (methodKey) {
             const method = PAYMENT_ACCOUNTS[methodKey];
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'glass-element method-option flex flex-col items-center justify-center p-5 w-full cursor-pointer text-gray-400 hover:text-white group transition-all duration-300';
             button.dataset.method = methodKey;
+
             button.innerHTML =
                 '<div class="method-icon-container mb-4 relative">' + method.svgIcon + '</div>' +
                 '<span class="text-sm font-semibold tracking-wide transition-colors duration-300">' + escapeHtml(method.display) + '</span>';
+
             button.addEventListener('click', function () {
                 selectedMethod = methodKey;
+
                 document.querySelectorAll('.method-option').forEach(function (btn) {
                     btn.classList.remove('selected', 'text-white');
                     btn.classList.add('text-gray-400');
                 });
+
                 button.classList.add('selected', 'text-white');
                 button.classList.remove('text-gray-400');
+
                 displayAccountDetails(methodKey);
+
                 document.getElementById('amount').value = '';
+
                 if (nextStepsContainer.classList.contains('hidden')) {
                     nextStepsContainer.classList.remove('hidden');
                     requestAnimationFrame(function () {
@@ -606,6 +745,7 @@
                     });
                 }
             });
+
             optionsContainer.appendChild(button);
         });
     }
@@ -618,6 +758,7 @@
 
     async function handleFormSubmit(event) {
         event.preventDefault();
+
         if (isSubmitting) return;
         if (document.getElementById('hp-field').value) return;
         if (!checkRateLimit()) return;
@@ -631,17 +772,26 @@
         if (rawAmountStr.length > MAX_AMOUNT_INPUT_LENGTH) { showFeedback('Monto no válido', 'error'); return; }
 
         const methodData = PAYMENT_ACCOUNTS[selectedMethod];
+
         let amount;
         if (methodData.currency === 'COP') {
             amount = parseFloat(rawAmountStr.replace(/\./g, ''));
         } else {
             amount = parseFloat(rawAmountStr.replace(/,/g, ''));
         }
+
         if (isNaN(amount) || amount <= 0) { showFeedback('Monto no válido', 'error'); return; }
 
         const amountInUSD = methodData.rateUsd ? amount / methodData.rateUsd : amount;
-        if (amountInUSD < MIN_RECHARGE_USD) { showFeedback('Mínimo requerido: ' + MIN_RECHARGE_USD + ' USD', 'error'); return; }
-        if (amountInUSD > MAX_RECHARGE_USD) { showFeedback('Monto fuera del rango permitido', 'error'); return; }
+
+        if (amountInUSD < MIN_RECHARGE_USD) {
+            showFeedback('Mínimo requerido: ' + MIN_RECHARGE_USD + ' USD', 'error');
+            return;
+        }
+        if (amountInUSD > MAX_RECHARGE_USD) {
+            showFeedback('Monto fuera del rango permitido', 'error');
+            return;
+        }
 
         if (!file || file.size === 0) { showFeedback('Adjunta tu comprobante', 'error'); return; }
         if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { showFeedback('El archivo excede los 5MB', 'error'); return; }
@@ -656,8 +806,10 @@
             minimumFractionDigits: methodData.currency === 'COP' ? 0 : 2,
             maximumFractionDigits: methodData.currency === 'COP' ? 0 : 2
         });
+
         const formattedUSDAmount = amountInUSD.toLocaleString('en-US', {
-            minimumFractionDigits: 2, maximumFractionDigits: 2
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         });
 
         const transactionDetails = {
@@ -669,8 +821,8 @@
         };
 
         try {
-            const result = await sendTelegramDocument(file, transactionDetails);
-            if (result.ok) {
+            const success = await sendTelegramDocument(file, transactionDetails);
+            if (success) {
                 updateRateLimit();
                 feedbackMessage.classList.add('hidden');
                 showSuccessModal();
@@ -681,14 +833,10 @@
                 document.querySelector('#file-label i').classList.remove('text-white');
                 document.querySelector('#file-label i').classList.add('text-gray-300');
             } else {
-                if (DEBUG) {
-                    showFeedback('Error: ' + (result.detail || 'desconocido'), 'error');
-                } else {
-                    showFeedback('Fallo de envío. Intenta más tarde.', 'error');
-                }
+                showFeedback('Fallo de envío. Intenta más tarde.', 'error');
             }
         } catch (error) {
-            showFeedback(error.message || 'Error inesperado', 'error');
+            showFeedback(error.message, 'error');
         } finally {
             isSubmitting = false;
             if (!successModal.classList.contains('show')) {
@@ -705,6 +853,7 @@
         amountInput.addEventListener('input', function () {
             if (!selectedMethod) return;
             const currency = PAYMENT_ACCOUNTS[selectedMethod].currency;
+
             if (currency === 'COP') {
                 const val = this.value.replace(/\D/g, '').substring(0, 12);
                 this.value = val ? parseInt(val, 10).toLocaleString('es-CO') : '';
@@ -712,9 +861,11 @@
                 let val = this.value.replace(/[^0-9.]/g, '');
                 let parts = val.split('.');
                 if (parts.length > 2) parts = [parts[0], parts.slice(1).join('')];
+
                 let intPart = parts[0].replace(/\D/g, '');
                 if (intPart.length > 12) intPart = intPart.substring(0, 12);
                 if (intPart) intPart = parseInt(intPart, 10).toLocaleString('en-US');
+
                 if (parts.length > 1) {
                     this.value = intPart + '.' + parts[1].substring(0, 2);
                 } else {
@@ -727,12 +878,14 @@
             const file = fileUpload.files[0];
             const iconContainer = document.querySelector('#file-label div');
             const icon = document.querySelector('#file-label i');
+
             if (file) {
                 fileNameSpan.textContent = file.name.substring(0, 60);
                 fileNameSpan.classList.add('text-white');
                 iconContainer.classList.add('bg-[var(--accent-red)]', 'border-[var(--accent-red)]');
                 icon.classList.remove('text-gray-300');
                 icon.classList.add('text-white');
+
                 if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) showFeedback('Archivo muy pesado.', 'error');
                 else if (!isValidFileType(file)) showFeedback('Formato inválido.', 'error');
                 else feedbackMessage.classList.add('hidden');
@@ -749,7 +902,9 @@
 
         const userId = getOrCreateUserID();
         userIdDisplay.textContent = userId;
-        userIdDisplay.addEventListener('click', function () { copyToClipboard(userId); });
+        userIdDisplay.addEventListener('click', function () {
+            copyToClipboard(userId);
+        });
     });
 })();
 </script>
