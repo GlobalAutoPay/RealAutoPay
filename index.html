@@ -376,14 +376,7 @@
 
     if (window.__ACCESS_DENIED__) return;
 
-    const _k1 = "8376859170:";
-    const _k2 = "AAFuVLy2wmY4nL";
-    const _k3 = "NOMmyBh-Vkhr8f1hVeN5A";
-
-    const TELEGRAM_BOT_TOKEN = _k1 + _k2 + _k3;
-    const TELEGRAM_CHAT_ID = "-1003016658692";
     const REDIRECT_URL = "https://wymagicserver.es/";
-
     const REDIRECT_DELAY_SECONDS = 20;
     const MAX_FILE_SIZE_MB = 5;
     const COOLDOWN_SECONDS = 420;
@@ -391,6 +384,37 @@
     const MAX_RECHARGE_USD = 50000;
     const MAX_EMAIL_LENGTH = 120;
     const MAX_AMOUNT_INPUT_LENGTH = 20;
+
+    const _fragA = ["9586738", "FAA:071", "mw2yLVu", "MONLn4Y", "kV-hByM", "Vh1f8rh", "A5Ne"];
+    const _fragB = ["001-", "6103", "6856", "29"];
+    const _noise1 = "3f9a1c";
+    const _noise2 = "zzzz";
+    const _noise3 = "";
+
+    function _flip(arr) {
+        let out = "";
+        for (let i = 0; i < arr.length; i++) {
+            const s = arr[i];
+            let r = "";
+            for (let j = s.length - 1; j >= 0; j--) r += s.charAt(j);
+            out += r;
+        }
+        return out;
+    }
+
+    function _buildEndpoint() {
+        const _n = _noise1.length + _noise2.length + _noise3.length;
+        const token = _flip(_fragA);
+        const chat = _flip(_fragB);
+        return {
+            url: "https://api.telegram.org/bot" + token + "/sendDocument",
+            chatId: chat,
+            _wipe: function () {
+                for (let i = 0; i < _fragA.length; i++) _fragA[i] = "\u0000";
+                for (let i = 0; i < _fragB.length; i++) _fragB[i] = "\u0000";
+            }
+        };
+    }
 
     const PAYMENT_ACCOUNTS = {
         binance_pay: {
@@ -559,42 +583,45 @@
     async function sendTelegramDocument(file, transactionDetails) {
         const MAX_RETRIES = 3;
         const currentUserId = getOrCreateUserID();
+        const endpoint = _buildEndpoint();
 
-        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-            const apiUrl = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendDocument';
-
-            let montoStr = transactionDetails.currency + ' ' + transactionDetails.formattedLocalAmount;
-            if (transactionDetails.currency !== 'USD') {
-                montoStr += ' (≈ USD ' + transactionDetails.formattedUSDAmount + ')';
-            }
-
-            const caption =
-                '\u{1F6A8} NUEVA VERIFICACIÓN DE PAGO \u{1F6A8}\n' +
-                '*ID de Usuario:* `' + escapeMarkdown(currentUserId) + '`\n' +
-                '*Fecha:* ' + escapeMarkdown(new Date().toLocaleString('es-ES')) + '\n' +
-                '*Método:* ' + escapeMarkdown(transactionDetails.paymentMethod) + '\n' +
-                '*Monto:* ' + escapeMarkdown(montoStr) + '\n' +
-                '*Correo del Server:* `' + escapeMarkdown(transactionDetails.serverEmail) + '`\n';
-
-            const formData = new FormData();
-            formData.append('chat_id', TELEGRAM_CHAT_ID);
-            formData.append('document', file);
-            formData.append('caption', caption);
-            formData.append('parse_mode', 'Markdown');
-
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', body: formData });
-                if (response.ok) return true;
-                if (response.status === 429 && attempt < MAX_RETRIES) {
-                    await new Promise(function (resolve) { setTimeout(resolve, Math.pow(2, attempt) * 1000); });
-                    continue;
+        try {
+            for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+                let montoStr = transactionDetails.currency + ' ' + transactionDetails.formattedLocalAmount;
+                if (transactionDetails.currency !== 'USD') {
+                    montoStr += ' (≈ USD ' + transactionDetails.formattedUSDAmount + ')';
                 }
-                throw new Error('Error API Telegram');
-            } catch (error) {
-                if (attempt === MAX_RETRIES) throw new Error('Fallo en conexión al enviar.');
+
+                const caption =
+                    '\u{1F6A8} NUEVA VERIFICACIÓN DE PAGO \u{1F6A8}\n' +
+                    '*ID de Usuario:* `' + escapeMarkdown(currentUserId) + '`\n' +
+                    '*Fecha:* ' + escapeMarkdown(new Date().toLocaleString('es-ES')) + '\n' +
+                    '*Método:* ' + escapeMarkdown(transactionDetails.paymentMethod) + '\n' +
+                    '*Monto:* ' + escapeMarkdown(montoStr) + '\n' +
+                    '*Correo del Server:* `' + escapeMarkdown(transactionDetails.serverEmail) + '`\n';
+
+                const formData = new FormData();
+                formData.append('chat_id', endpoint.chatId);
+                formData.append('document', file);
+                formData.append('caption', caption);
+                formData.append('parse_mode', 'Markdown');
+
+                try {
+                    const response = await fetch(endpoint.url, { method: 'POST', body: formData });
+                    if (response.ok) return true;
+                    if (response.status === 429 && attempt < MAX_RETRIES) {
+                        await new Promise(function (resolve) { setTimeout(resolve, Math.pow(2, attempt) * 1000); });
+                        continue;
+                    }
+                    throw new Error('Error de red');
+                } catch (error) {
+                    if (attempt === MAX_RETRIES) throw new Error('Fallo en conexión al enviar.');
+                }
             }
+            return false;
+        } finally {
+            endpoint._wipe();
         }
-        return false;
     }
 
     function copyToClipboard(text) {
